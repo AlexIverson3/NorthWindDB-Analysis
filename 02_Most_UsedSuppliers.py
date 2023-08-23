@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from tabulate import tabulate
-from northwind import conn_db
+from functions import conn_db
 
 
 # [ TOP USED SUPPLIERS ] 

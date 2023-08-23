@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 from tabulate import tabulate
-from northwind import conn_db
+from functions import conn_db
 
 
 # [ BEST CUSTOMERS ]
@@ -33,11 +33,11 @@ print()
 
 # GRÁFICA MATPLOTLIB
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
-bestCustomers.plot( x = "ProductName", y = [ 'TOTAL ORDERS', 'PURCHASE', 'AVG. PURCHASE' ],
-                    kind = "bar", figsize = ( 10, 5 ), legend = False )
+bestCustomers.plot( x = "CUSTOMERS", y = [ 'TOTAL ORDERS', 'PURCHASE', 'AVG PURCHASE' ],
+                    kind = "barh", figsize = ( 10, 5 ), legend = True )
 plt.title( "BEST COSTUMERS" )
-plt.xlabel( "PRODUCTS" )
-plt.ylabel( "SALES" )
-plt.xticks( rotation = 45 )
+plt.xlabel( "PURCHASE & AVG PURCHASE" )
+plt.ylabel( "CUSTOMERS" )
+plt.yticks( rotation = 0 )
 plt.show()
 #=============================================================================================================================
