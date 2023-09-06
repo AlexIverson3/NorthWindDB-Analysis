@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from tabulate import tabulate
-from northwind import conn_db
+from functions import conn_db
 
 
 # [ MOST PROFITABLE SUPPLIER BY GEOGRAPHIC ZONE ] 
