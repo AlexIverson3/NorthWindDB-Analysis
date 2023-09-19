@@ -1,21 +1,21 @@
 import matplotlib.pyplot as plt
-from tabulate import tabulate
-from functions import conn_db
+from functions import conn_db, print_table, create_matplot, create_bar, create_labels, config_tickparams
 
 
 # [ AVG TICKET CUSTOMER ]
 #=============================================================================================================================
 avgTicketCustomer = conn_db( query = '''
                                         SELECT 	c.CustomerName, c.Country,
-                                                ROUND( (od.Quantity * p.Price / 1.00), 2 ) AS AvgPriceTicket
+                                                ROUND( ( od.Quantity * p.Price / 1.00 ), 2 ) 
+                                                        AS AvgPriceTicket
 
                                         FROM 	[Customers] c
                                         JOIN 	[Orders] o 
-                                                    ON o.CustomerID = c.CustomerID
+                                                ON o.CustomerID = c.CustomerID
                                         JOIN 	[OrderDetails] od 
-                                                    ON od.OrderID = o.OrderID
+                                                ON od.OrderID = o.OrderID
                                         JOIN 	[Products] p 
-                                                    ON p.ProductID = od.ProductID
+                                                ON p.ProductID = od.ProductID
 
                                         GROUP BY c.CustomerName
                                         ORDER BY AvgPriceTicket DESC
@@ -25,49 +25,39 @@ avgTicketCustomer = conn_db( query = '''
                                  
                             columns = [ 'CUSTOMER', 'COUNTRY', 'AVERAGE TICKET' ] )
 
-print("\n==[ AVERAGE TICKET BY CUSTOMER ]==")
-print( tabulate( avgTicketCustomer, headers = "keys", tablefmt = "pretty" ) )
+
+print_table( title = "==[ AVERAGE TICKET BY CUSTOMER (TOP 15) ]==", 
+             df_name = avgTicketCustomer )
 
 
 
 # GRÁFICA MATPLOTLIB
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#--------------------------------------------------------------------------------------------------------
+
 customer = avgTicketCustomer[ "CUSTOMER" ].apply( lambda x: x.replace(" ", "\n") ) 
 avg_ticket = avgTicketCustomer[ "AVERAGE TICKET" ]
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
-plt.style.use( "bmh" )
+create_matplot ( style = "bmh", nrows = 1, ncols = 1, figsize = ( 16, 10 ), 
+                 suptitle_label = "TOP 15 - AVERAGE TICKET BY CUSTOMER" )
 
-fig, ax = plt.subplots( nrows = 1, ncols = 1, 
-                        figsize = ( 16, 10 ) )
-
-plt.suptitle( "TOP 15 - AVERAGE TICKET BY CUSTOMER", 
-              fontsize = 35, color = "firebrick", fontweight = "bold" )
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
-bar_avgticket = plt.bar( x = customer, height = avg_ticket,
-                         color = [ "indianred", "orange" ], 
-                         edgecolor = "darkred" )
+create_bar( x       = customer,
+            height  = avg_ticket, 
+            edgecolor = "darkred", color_container = [ "indianred", "orange" ], 
+            fmt = "${:,.0f}", label_type = "center", 
+            fontweight = "bold", fontsize = 10, color_label = "snow" )
 
-plt.bar_label( bar_avgticket, fmt = "${:,.0f}", label_type = "center",
-               fontsize = 10, fontweight = "bold", color = "snow" )
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
-plt.xlabel( "CUSTOMER", 
-            labelpad = 15, fontsize = 8.25, color = "firebrick", 
-            fontweight = "bold", bbox = { 'boxstyle': 'round', 
-                                          'facecolor': 'linen',
-                                          'edgecolor': 'firebrick', 
-                                          'pad': 0.6 } )
-plt.ylabel( " AVERAGE TICKET", 
-            labelpad = 15, fontsize = 8.25, color = "firebrick", 
-            fontweight = "bold", bbox = { 'boxstyle': 'round', 
-                                          'facecolor': 'linen',
-                                          'edgecolor': 'firebrick', 
-                                          'pad': 0.6 } )
+create_labels( xlabel = "CUSTOMER", 
+               ylabel = " AVERAGE TICKET" )
 
-plt.tick_params( direction = "out", length = 5, width = 1.5, 
-                 colors = "firebrick", labelsize = 9,
-                 grid_color = "lightsalmon", grid_alpha = 0.8 )
+config_tickparams( direction = "out", rotation = 0, colors = "firebrick", 
+                   labelsize = 9, grid_color = "lightsalmon" )
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
 plt.tight_layout()
 plt.show()
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#--------------------------------------------------------------------------------------------------------
 #=============================================================================================================================

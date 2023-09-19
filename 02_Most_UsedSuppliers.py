@@ -1,17 +1,16 @@
 import matplotlib.pyplot as plt
-from tabulate import tabulate
-from functions import conn_db
+from functions import conn_db, print_table, create_matplot, create_barh, create_labels, config_tickparams
 
 
 # [ TOP USED SUPPLIERS ] 
 #=============================================================================================================================
 topUsedSuppliers = conn_db( query = '''
                                         SELECT  s.SupplierName, s.City, s.Country, 
-                                                COUNT(s.SupplierID) 
+                                                COUNT( s.SupplierID ) 
                                                     AS SuppliedProducts
                                         
-                                        FROM [Suppliers] s
-                                        JOIN [Products] p 
+                                        FROM    [Suppliers] s
+                                        JOIN    [Products] p 
                                             ON s.SupplierID = p.SupplierID
                                 
                                         GROUP BY s.SupplierID
@@ -20,51 +19,35 @@ topUsedSuppliers = conn_db( query = '''
 
                             columns = [ 'SUPPLIER', 'CITY', 'COUNTRY', 'PRODUCTS' ] )
 
-print("\n==[ MOST USED SUPPLIERS ]==")
-print( tabulate( topUsedSuppliers, headers = "keys", tablefmt= "pretty" ) )
+print_table( title = "==[ MOST USED SUPPLIERS ]==", 
+             df_name = topUsedSuppliers )
+
 
 
 # GRÁFICA MATPLOTLIB
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-supplier = topUsedSuppliers[ "SUPPLIER" ]
-products = topUsedSuppliers[ "PRODUCTS" ]
+#--------------------------------------------------------------------------------------------------------
+
+create_matplot( style = "bmh", nrows = 1, ncols = 1, figsize = ( 16, 8 ), 
+                suptitle_label = "MOST USED SUPPLIERS" )
+
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
-plt.style.use( "bmh" )
+create_barh( y      = topUsedSuppliers[ "SUPPLIER" ], 
+             width  = topUsedSuppliers[ "PRODUCTS" ], 
+             edgecolor = "darkred", color_container = [ "indianred", "orange" ],
+             fmt = " {:,.0f} products", label_type = "edge", 
+             fontweight = "semibold", fontsize = 7, color_label = "dimgray" )
 
-
-topUsedSuppliers.plot( x = "SUPPLIER", y = "PRODUCTS", kind = "barh",
-                       figsize = ( 16, 8 ), legend = False )
-
-plt.suptitle( "MOST USED SUPPLIERS", 
-              fontsize = 35, color = "firebrick", fontweight = "bold" )
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
-barh_container = plt.barh( y = supplier, width = products,
-                           color = ["indianred", "orange"], 
-                           edgecolor = "darkred" )
+create_labels( xlabel = "TOTAL SUPPLIED PRODUCTS",
+               ylabel = "SUPPLIERS" )
 
-plt.bar_label( barh_container, fmt = " {:,.0f} products", label_type = "edge",
-               fontweight = "semibold", fontsize = 7, color = "dimgray" )
-#¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
-plt.xlabel( "TOTAL SUPPLIED PRODUCTS", 
-            labelpad = 15, fontsize = 8.25, color = "firebrick", 
-            fontweight = "bold", bbox = { 'boxstyle': 'round', 
-                                          'facecolor': 'linen',
-                                          'edgecolor': 'firebrick', 
-                                          'pad': 0.6 } )
-plt.ylabel( "SUPPLIERS", 
-            labelpad = 15, fontsize = 8.25, color = "firebrick", 
-            fontweight = "bold", bbox = { 'boxstyle': 'round', 
-                                          'facecolor': 'linen',
-                                          'edgecolor': 'firebrick', 
-                                          'pad': 0.6 } )
+config_tickparams( direction = "out", rotation = 0, colors = "firebrick", 
+                   labelsize = 8, grid_color = "lightsalmon" )
 
-plt.tick_params( direction = "out", length = 5, width = 1.5, 
-                 colors = "firebrick", labelsize = 8, 
-                 grid_color = "lightsalmon", grid_alpha = 0.8 )
 #¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨¨
 plt.tight_layout()
-plt.get_current_fig_manager()
 plt.show()
-#^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+#--------------------------------------------------------------------------------------------------------
 #=============================================================================================================================
 
